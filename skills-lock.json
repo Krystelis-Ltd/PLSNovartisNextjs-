@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "skills": {
+    "docx-to-markdown": {
+      "source": "duc01226/easyplatform",
+      "sourceType": "github",
+      "computedHash": "d174a3e96e6f25897c036cfb22ef03f0cd6055a72abbdade20e8fe54fd833343"
+    },
+    "framer-motion-animator": {
+      "source": "patricio0312rev/skills",
+      "sourceType": "github",
+      "computedHash": "22a8401fab0cdf32d5c153b98aba5e95435a479810896879535dc7ac3710efbe"
+    },
+    "frontend-design": {
+      "source": "anthropics/skills",
+      "sourceType": "github",
+      "computedHash": "516bd2154eb843a8240e43d5b285229129853114ad7075a5e141e1c08e408c84"
+    },
+    "markitdown": {
+      "source": "davila7/claude-code-templates",
+      "sourceType": "github",
+      "computedHash": "1b2ff0693423568ec77669ccb66c7e07363ae3aabef1ff73987490f257d4d46b"
+    },
+    "next-best-practices": {
+      "source": "vercel-labs/next-skills",
+      "sourceType": "github",
+      "computedHash": "c31ddd68ba5798a79a516c619b1e1fc4408cc4876ad600fefa4f5add4425719d"
+    },
+    "openai-agents-sdk": {
+      "source": "laguagu/claude-code-nextjs-skills",
+      "sourceType": "github",
+      "computedHash": "7916e7c879cc92d4a08eac4a5341b2ee7d6cbcb350b9f8169b3bfceb34f169e6"
+    }
+  }
+}
