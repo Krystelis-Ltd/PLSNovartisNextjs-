@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getOpenAIClient } from '@/lib/openai';
 import { AI_MODEL } from '@/lib/constants';
-import { getUserIdentity } from '@/lib/auth';
+import { timedAuditLog } from '@/lib/audit-logger';
 import type { OpenAIResponsePayload, ChatRequest } from '@/types';
 
 export const maxDuration = 300;
@@ -9,7 +9,6 @@ export const maxDuration = 300;
 export async function POST(request: NextRequest) {
     const openai = getOpenAIClient();
     try {
-        const userId = getUserIdentity(request);
         const body: ChatRequest = await request.json();
         const { messages, vectorStoreId, fetchedAnswers } = body;
 
@@ -18,7 +17,14 @@ export async function POST(request: NextRequest) {
         }
 
         const lastMessage = messages[messages.length - 1]?.content || "";
-        console.log(`[AUDIT] [chat] User "${userId}" sent message: "${lastMessage}"`);
+        const logger = timedAuditLog(request, 'chat', 'chat_message', {
+            vector_store_id: vectorStoreId,
+            request: {
+                message_length: lastMessage.length,
+                conversation_length: messages.length,
+                context_keys: Object.keys(fetchedAnswers || {})
+            }
+        });
 
         const systemMessage = `
             You are a helpful and expert AI document medical assistant.
@@ -89,6 +95,16 @@ export async function POST(request: NextRequest) {
                     args = {};
                 }
 
+                logger.finish({
+                    status: 200,
+                    vector_store_id: vectorStoreId,
+                    response: {
+                        type: 'function_call',
+                        function_name: 'update_json_value',
+                        updated_key: args.key
+                    }
+                });
+
                 return NextResponse.json({
                     functionCall: {
                         name: "update_json_value",
@@ -100,7 +116,16 @@ export async function POST(request: NextRequest) {
 
             reply = response.output_text || response.choices?.[0]?.message?.content || "";
             if (reply) {
-                return NextResponse.json({ reply: reply.replace(/^```[a-z]*\n/i, '').replace(/\n```$/i, '').trim() });
+                reply = reply.replace(/^```[a-z]*\n/i, '').replace(/\n```$/i, '').trim();
+                logger.finish({
+                    status: 200,
+                    vector_store_id: vectorStoreId,
+                    response: {
+                        type: 'text_reply',
+                        reply_length: reply.length
+                    }
+                });
+                return NextResponse.json({ reply });
             }
         } catch (e: unknown) {
             console.warn("[chat] responses.create failed, falling back to beta thread:", e instanceof Error ? e.message : String(e));
@@ -137,11 +162,22 @@ export async function POST(request: NextRequest) {
 
         reply = reply.replace(/^```[a-z]*\n/i, '').replace(/\n```$/i, '').trim();
 
+        logger.finish({
+            status: 200,
+            vector_store_id: vectorStoreId,
+            response: {
+                type: 'text_reply_fallback',
+                reply_length: reply.length
+            }
+        });
+
         return NextResponse.json({ reply });
 
     } catch (error: unknown) {
         const msg = error instanceof Error ? error.message : String(error);
-        console.error("[chat] Error:", msg);
+        const logger = timedAuditLog(request, 'chat', 'chat_message');
+        logger.finish({ status: 500, error: msg });
         return NextResponse.json({ error: "Chat failed", details: msg }, { status: 500 });
     }
 }
+

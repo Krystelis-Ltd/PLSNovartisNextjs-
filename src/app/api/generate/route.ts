@@ -5,12 +5,11 @@ import JSZip from 'jszip';
 import fs from 'fs';
 import path from 'path';
 import { TABLE_HEADER_COLORS, TREATMENT_COLOR_PALETTE } from '@/lib/constants';
-import { getUserIdentity } from '@/lib/auth';
+import { timedAuditLog } from '@/lib/audit-logger';
 import type { GenerateRequest, TreatmentGroup, ChartEndpointItem, ChartDataset } from '@/types';
 
 export async function POST(request: NextRequest) {
     try {
-        const userId = getUserIdentity(request);
         const body: GenerateRequest = await request.json();
         const { parsedData, mappingName } = body;
 
@@ -18,7 +17,12 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Missing parsedData for generation' }, { status: 400 });
         }
 
-        console.log(`[AUDIT] [generate] User "${userId}" generating report for mapping: "${mappingName}"`);
+        const logger = timedAuditLog(request, 'generate', 'report_generation', {
+            request: {
+                mapping_name: mappingName,
+                data_keys: Object.keys(parsedData)
+            }
+        });
 
         const zip = new JSZip();
 
@@ -434,6 +438,16 @@ export async function POST(request: NextRequest) {
         // 3. Zip and Return
         const zipBuffer = await zip.generateAsync({ type: 'nodebuffer' });
 
+        logger.finish({
+            status: 200,
+            response: {
+                output_filename: zipFilename,
+                zip_size_bytes: zipBuffer.length,
+                pptx_included: !!pptxBuffer,
+                docx_filename: docxFilename
+            }
+        });
+
         return new Response(zipBuffer as unknown as BodyInit, {
             status: 200,
             headers: {
@@ -445,7 +459,8 @@ export async function POST(request: NextRequest) {
 
     } catch (error: unknown) {
         const msg = error instanceof Error ? error.message : String(error);
-        console.error("[generate] Error:", msg);
+        const logger = timedAuditLog(request, 'generate', 'report_generation');
+        logger.finish({ status: 500, error: msg });
         return NextResponse.json({ error: "Generation failed", details: msg }, { status: 500 });
     }
 }

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getOpenAIClient } from '@/lib/openai';
 import { MAX_FILE_SIZE_BYTES, ALLOWED_FILE_EXTENSIONS } from '@/lib/constants';
-import { getUserIdentity } from '@/lib/auth';
+import { timedAuditLog, auditLog } from '@/lib/audit-logger';
 import type { UploadStats } from '@/types';
 
 export const maxDuration = 300;
@@ -9,7 +9,6 @@ export const maxDuration = 300;
 export async function POST(request: NextRequest) {
     const openai = getOpenAIClient();
     try {
-        const userId = getUserIdentity(request);
         const formData = await request.formData();
         const files = formData.getAll('files') as File[];
 
@@ -19,11 +18,19 @@ export async function POST(request: NextRequest) {
 
         // Validate file sizes and types
         const fileAuditInfo = files.map(f => `${f.name} (${(f.size / 1024).toFixed(1)} KB)`);
-        console.log(`[AUDIT] [upload] User "${userId}" initiated upload for ${files.length} files: ${fileAuditInfo.join(', ')}`);
+        const logger = timedAuditLog(request, 'upload', 'file_upload', {
+            request: {
+                file_count: files.length,
+                files: fileAuditInfo
+            }
+        });
 
         for (const file of files) {
             if (file.size > MAX_FILE_SIZE_BYTES) {
-                console.warn(`[AUDIT] [REJECTED] [upload] User "${userId}" tried to upload "${file.name}" — exceeds size limit (${(file.size / 1024 / 1024).toFixed(2)}MB > ${MAX_FILE_SIZE_BYTES / 1024 / 1024}MB)`);
+                auditLog(request, 'upload', 'upload_rejected', {
+                    status: 400,
+                    request: { file_name: file.name, file_size_mb: (file.size / 1024 / 1024).toFixed(2), reason: 'exceeds_size_limit' }
+                });
                 return NextResponse.json(
                     { error: `File "${file.name}" exceeds maximum size of ${MAX_FILE_SIZE_BYTES / 1024 / 1024}MB` },
                     { status: 400 }
@@ -31,7 +38,10 @@ export async function POST(request: NextRequest) {
             }
             const ext = '.' + file.name.split('.').pop()?.toLowerCase();
             if (!ALLOWED_FILE_EXTENSIONS.includes(ext as typeof ALLOWED_FILE_EXTENSIONS[number])) {
-                console.warn(`[AUDIT] [REJECTED] [upload] User "${userId}" tried to upload "${file.name}" — unsupported extension "${ext}"`);
+                auditLog(request, 'upload', 'upload_rejected', {
+                    status: 400,
+                    request: { file_name: file.name, extension: ext, reason: 'unsupported_extension' }
+                });
                 return NextResponse.json(
                     { error: `File "${file.name}" has unsupported extension. Allowed: ${ALLOWED_FILE_EXTENSIONS.join(', ')}` },
                     { status: 400 }
@@ -39,7 +49,7 @@ export async function POST(request: NextRequest) {
             }
         }
 
-        console.log(`[upload] Starting upload of ${files.length} files to OpenAI storage`);
+
 
         const uploadedFileIds: string[] = [];
         const errors: string[] = [];
@@ -88,7 +98,17 @@ export async function POST(request: NextRequest) {
             errors.push(`Vector store creation failed: ${msg}`);
         }
 
-        console.log(`[AUDIT] [upload] User "${userId}" successfully processed ${uploadedFileIds.length} files into Vector Store: ${vectorStoreId}`);
+
+        logger.finish({
+            status: uploadedFileIds.length > 0 && vectorStoreId !== '' ? 200 : 500,
+            vector_store_id: vectorStoreId,
+            response: {
+                successful_uploads: uploadedFileIds.length,
+                failed_uploads: errors.length,
+                vector_store_id: vectorStoreId
+            },
+            ...(errors.length > 0 ? { error: errors.join('; ') } : {})
+        });
 
         const stats: UploadStats = {
             total_files_submitted: files.length,
@@ -104,7 +124,7 @@ export async function POST(request: NextRequest) {
 
     } catch (error: unknown) {
         const msg = error instanceof Error ? error.message : String(error);
-        console.error("[upload] Error:", msg);
+        auditLog(request, 'upload', 'file_upload_failed', { status: 500, error: msg });
         return NextResponse.json(
             { error: "Failed to process upload", details: msg },
             { status: 500 }

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getOpenAIClient } from '@/lib/openai';
 import { AI_MODEL } from '@/lib/constants';
-import { getUserIdentity } from '@/lib/auth';
+import { timedAuditLog } from '@/lib/audit-logger';
 import type { OpenAIResponsePayload, RefineRequest } from '@/types';
 
 export const maxDuration = 300;
@@ -9,7 +9,6 @@ export const maxDuration = 300;
 export async function POST(request: NextRequest) {
     const openai = getOpenAIClient();
     try {
-        const userId = getUserIdentity(request);
         const body: RefineRequest = await request.json();
         const { rawJson, userInstructions, vectorStoreId } = body;
 
@@ -18,7 +17,13 @@ export async function POST(request: NextRequest) {
         }
 
         const keysBeingRefined = typeof rawJson === 'string' ? 'String Payload' : Object.keys(rawJson).join(', ');
-        console.log(`[AUDIT] [refine] User "${userId}" requested AI refinement. Instructions: "${userInstructions || 'None'}". Data keys: [${keysBeingRefined}]`);
+        const logger = timedAuditLog(request, 'refine', 'refinement', {
+            request: {
+                data_keys: keysBeingRefined,
+                has_user_instructions: !!userInstructions,
+                input_size_bytes: typeof rawJson === 'string' ? rawJson.length : JSON.stringify(rawJson).length
+            }
+        });
 
         const KB_VECTOR_STORE_ID = process.env.NOVARTIS_KB_VECTOR_STORE_ID || "";
         if (!KB_VECTOR_STORE_ID) {
@@ -183,17 +188,25 @@ ${rawJson}`;
             // Clean up any rogue markdown formatting returned by AI
             refinedJson = refinedJson.replace(/^```[a-z]*\n/i, '').replace(/\n```$/i, '').trim();
 
+            logger.finish({
+                status: 200,
+                response: {
+                    output_size_bytes: Buffer.byteLength(refinedJson, 'utf-8'),
+                    kb_vector_store_used: !!KB_VECTOR_STORE_ID
+                }
+            });
+
             return NextResponse.json({ refinedJson });
 
         } catch (openaiError: unknown) {
             const msg = openaiError instanceof Error ? openaiError.message : String(openaiError);
-            console.error("[refine] OpenAI API Error:", msg);
+            logger.finish({ status: 500, error: msg });
             throw openaiError;
         }
 
     } catch (error: unknown) {
         const msg = error instanceof Error ? error.message : String(error);
-        console.error("[refine] Error:", msg);
         return NextResponse.json({ error: "Refinement failed", details: msg }, { status: 500 });
     }
 }
+

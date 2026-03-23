@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getOpenAIClient } from '@/lib/openai';
 import { withRetry } from '@/lib/retry';
 import { AI_MODEL } from '@/lib/constants';
-import { getUserIdentity } from '@/lib/auth';
+import { timedAuditLog } from '@/lib/audit-logger';
 import type { OpenAIResponsePayload, ValidateRequest } from '@/types';
 
 export const maxDuration = 300;
@@ -10,14 +10,23 @@ export const maxDuration = 300;
 export async function POST(request: NextRequest) {
     const openai = getOpenAIClient();
     try {
-        const userId = getUserIdentity(request);
         const body: ValidateRequest = await request.json();
         const { keyName, extractedData, sourceQuote } = body;
 
-        console.log(`[AUDIT] [validate] User "${userId}" requested validation for key: "${keyName}"`);
+        const logger = timedAuditLog(request, 'validate', 'validation', {
+            request: {
+                key_name: keyName,
+                input_size_bytes: JSON.stringify(extractedData).length,
+                has_source_quote: !!sourceQuote
+            }
+        });
 
         // Only validate specific complex tables
         if (!keyName.includes('table')) {
+            logger.finish({
+                status: 200,
+                response: { skipped: true, reason: 'not_a_table_key' }
+            });
             return NextResponse.json({ validatedData: extractedData });
         }
 
@@ -63,18 +72,30 @@ ${JSON.stringify(extractedData)}
         const cleaned = raw.replace(/^```json/mi, '').replace(/```$/m, '').trim();
 
         let parsedValidatedData;
+        let dataChanged = false;
         try {
             parsedValidatedData = JSON.parse(cleaned);
+            dataChanged = JSON.stringify(parsedValidatedData) !== JSON.stringify(extractedData);
         } catch {
-            console.warn("[validate] AI returned invalid JSON, falling back to original data");
             parsedValidatedData = extractedData;
         }
+
+        logger.finish({
+            status: 200,
+            response: {
+                data_changed: dataChanged,
+                output_size_bytes: Buffer.byteLength(cleaned, 'utf-8'),
+                fallback_used: !dataChanged && cleaned !== JSON.stringify(extractedData)
+            }
+        });
 
         return NextResponse.json({ validatedData: parsedValidatedData });
 
     } catch (error: unknown) {
         const msg = error instanceof Error ? error.message : String(error);
-        console.error("[validate] Error:", msg);
+        const logger = timedAuditLog(request, 'validate', 'validation');
+        logger.finish({ status: 500, error: msg });
         return NextResponse.json({ error: "Validation failed" }, { status: 500 });
     }
 }
+
