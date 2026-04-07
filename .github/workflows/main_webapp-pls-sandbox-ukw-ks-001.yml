@@ -1,39 +1,75 @@
-# Docs for the Azure Web Apps Deploy action: https://go.microsoft.com/fwlink/?linkid=2134798
-# More GitHub Actions for Azure: https://go.microsoft.com/fwlink/?linkid=2135048
+# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
+# More GitHub Actions for Azure: https://github.com/Azure/actions
 
-name: Azure App Service - webapp-pls-sandbox-ukw-ks-001(Production), Build and deploy NodeJS app
+name: Build and deploy Node.js app to Azure Web App - webapp-pls-sandbox-ukw-ks-001
 
 on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
-  build-and-deploy:
-    runs-on: ubuntu-latest
+  build:
+    runs-on: self-hosted
+    permissions:
+      contents: read # This is required for actions/checkout
 
     steps:
-    # checkout the repo
-    - name: 'Checkout Github Action'
-      uses: actions/checkout@master
+      - uses: actions/checkout@v4
 
+      - name: Set up Node.js version
+        uses: actions/setup-node@v4 # Upgraded to v4 for latest best practices
+        with:
+          node-version: '22.x'
+          cache: 'npm' # Added npm caching to speed up subsequent builds
 
-    - name: Set up Node.js version
-      uses: actions/setup-node@v1
-      with:
-        node-version: '22-lts'
+      - name: Clean Install Dependencies
+        run: npm ci
 
-    - name: npm install, build, and test
-      run: |
-        npm install
-        npm run build --if-present
-        npm run test --if-present
+      - name: Build Next.js Application
+        run: npm run build
 
-    - name: Run Azure webapp deploy action using publish profile credentials
-      uses: azure/webapps-deploy@v2
-      with:
-        app-name: webapp-pls-sandbox-ukw-ks-001
-        slot-name: Production
-        publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_860D36FF4A8C4BB3B4DBD014ABEAAC49 }}
-        package: .
+      - name: Prepare Standalone Directory for Azure
+        run: |
+          # Copy static assets into the standalone folder
+          cp -R public .next/standalone/public
+          cp -R .next/static .next/standalone/.next/static
+          # pptxgenjs is externalized via serverExternalPackages, so manually include it
+          cp -R node_modules/pptxgenjs .next/standalone/node_modules/pptxgenjs
 
+      - name: Upload artifact for deployment job
+        uses: actions/upload-artifact@v4
+        with:
+          name: node-app
+          # CRITICAL CHANGE: Only upload the optimized standalone folder, not the whole repo
+          path: .next/standalone 
+
+  deploy:
+    runs-on: self-hosted
+    needs: build
+    permissions:
+      id-token: write # This is required for requesting the JWT for OIDC
+      contents: read # This is required for actions/checkout
+
+    steps:
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v4
+        with:
+          name: node-app
+      
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_SANDBOX }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID }}
+
+      - name: 'Deploy to Azure Web App'
+        id: deploy-to-webapp
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: 'webapp-pls-sandbox-ukw-ks-001'
+          slot-name: 'Production'
+          # Because we downloaded the artifact, the current directory (.) now contains ONLY the standalone files.
+          package: .
