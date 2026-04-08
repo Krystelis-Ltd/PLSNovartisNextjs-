@@ -91,7 +91,7 @@ export function Chatbot({ vectorStoreId, fetchedAnswers, onUpdateData }: Chatbot
                                 <span className="material-symbols-outlined text-xl">forum</span>
                                 <span className="font-bold text-sm">Contextual Chatbot</span>
                             </div>
-                            <button onClick={() => setIsOpen(false)} className="hover:bg-white/20 rounded-full p-1 transition-colors">
+                            <button onClick={() => setIsOpen(false)} aria-label="Close chatbot" className="hover:bg-white/20 rounded-full p-1 transition-colors">
                                 <span className="material-symbols-outlined text-lg block">close</span>
                             </button>
                         </div>
@@ -164,6 +164,7 @@ export function Chatbot({ vectorStoreId, fetchedAnswers, onUpdateData }: Chatbot
                                             whileTap={{ scale: 0.92 }}
                                             onClick={handleSend}
                                             disabled={!input.trim() || isLoading}
+                                            aria-label="Send message"
                                             className="bg-[var(--color-primary)] text-white h-10 w-10 rounded-full flex items-center justify-center hover:bg-[var(--color-primary-dark)] transition-colors disabled:opacity-50 shrink-0 shadow-md"
                                         >
                                             <span className="material-symbols-outlined text-[18px]">send</span>
@@ -186,6 +187,7 @@ export function Chatbot({ vectorStoreId, fetchedAnswers, onUpdateData }: Chatbot
                         whileTap={{ scale: 0.9 }}
                         transition={{ type: 'spring', stiffness: 500, damping: 25 }}
                         onClick={() => setIsOpen(true)}
+                        aria-label="Open chatbot"
                         className="h-14 w-14 bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] text-white rounded-full shadow-[var(--shadow-elevated)] flex items-center justify-center"
                     >
                         <span className="material-symbols-outlined text-2xl">chat</span>
