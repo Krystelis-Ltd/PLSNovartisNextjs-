@@ -206,6 +206,6 @@ ${rawJson}`;
             status: { code: 500, result: 'FAILURE' },
             details: { error: msg }
         });
-        return NextResponse.json({ error: "Refinement failed", details: msg }, { status: 500 });
+        return NextResponse.json({ error: "Refinement failed" }, { status: 500 });
     }
 }
