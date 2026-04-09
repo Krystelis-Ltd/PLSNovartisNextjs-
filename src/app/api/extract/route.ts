@@ -179,7 +179,7 @@ export async function POST(request: NextRequest) {
             details: { error: msg }
         });
         return NextResponse.json(
-            { error: "Extraction failed", details: msg },
+            { error: "Extraction failed" },
             { status: 500 }
         );
     }
