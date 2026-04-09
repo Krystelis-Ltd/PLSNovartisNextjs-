@@ -1,0 +1,3 @@
+## 2024-05-24 - [React Component Optimization in Next.js App]
+**Learning:** `React.memo()` is completely ineffective if the props passed to the component are recreated on every render. For example, inline functions or arrays/objects generated dynamically (like via `reduce()` or `map()`) will fail `React.memo`'s shallow equality check.
+**Action:** Instead of prematurely wrapping components in `React.memo`, ensure prop references are stable by using `useMemo` for derived complex state and `useCallback` for functions, paying close attention to dependency arrays to avoid stale closures. Memoized `currentFetchedAnswers` computation in `page.tsx`.
