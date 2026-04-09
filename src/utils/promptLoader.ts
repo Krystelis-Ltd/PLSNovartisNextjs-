@@ -1,4 +1,4 @@
-import extractedData from './extracted_data.json';
+import extractedData from './extracted_data.json' with { type: 'json' };
 
 // Type definitions for our extracted data
 export type PromptMapping = typeof extractedData.mappings.results_PLS;

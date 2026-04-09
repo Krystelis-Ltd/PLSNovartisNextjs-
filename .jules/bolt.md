@@ -1,0 +1,3 @@
+## 2025-04-09 - [React Memoization for Interval Timers]
+**Learning:** In the Dashboard component, a 100ms interval timer runs during extraction, causing rapid re-renders. Complex derived states (like prompt extraction or array reducing) and callbacks without `useMemo`/`useCallback` caused severe UI stuttering and unoptimized performance because they were recreated 10 times a second.
+**Action:** When a React component contains frequent interval timers (e.g. for real-time progress or clocks), aggressively apply `useMemo` and `useCallback` to all derived state, array operations, and function props to prevent blocking the main thread during rapid re-renders.
