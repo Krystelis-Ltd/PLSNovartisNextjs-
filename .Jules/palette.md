@@ -1,0 +1,3 @@
+## 2024-04-10 - Missing ARIA labels on textless icon buttons
+**Learning:** The codebase heavily relies on textless `material-symbols-outlined` icons wrapped in buttons without `aria-label`s or keyboard focus rings for critical actions (e.g., in Chatbot.tsx, PipelineTestUI.tsx, JsonEditor.tsx). This creates an app-wide anti-pattern where screen readers read "button" instead of the action, and keyboard users lack visual focus context.
+**Action:** Always ensure any icon-only button receives an explicit `aria-label` attribute describing its function, alongside a `focus-visible` ring style for keyboard accessibility.
