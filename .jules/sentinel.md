@@ -1,0 +1,4 @@
+## 2024-04-11 - [Prevent Information Disclosure in API Error Responses]
+**Vulnerability:** Several API routes (`extract`, `chat`, `refine`, `convert-to-markdown`, `generate`, and `upload`) were returning detailed error messages (such as `details: msg`) in their 500 error responses (e.g., `NextResponse.json({ error: "Extraction failed", details: msg })`).
+**Learning:** Returning detailed error messages to the client can inadvertently leak sensitive system state, internal stack traces, or external API failures, which could be exploited by an attacker to gain insights into the application's architecture or vulnerabilities.
+**Prevention:** Always follow the "Fail Securely" principle by returning only generic error messages to the client (e.g., `{ error: "Extraction failed" }`) and ensuring that detailed error information is logged securely on the server side using the `auditLog` function or `console.error`.
