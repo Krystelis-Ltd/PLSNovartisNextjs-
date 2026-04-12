@@ -1,0 +1,3 @@
+## 2025-02-19 - Avoid unmemoized derived state with rapid timers
+**Learning:** In React, rapid local timers (like the 100ms interval for extraction duration in the Dashboard) trigger complete re-renders of the component incredibly often. If expensive operations (like filtering arrays, reducing results, or decoding prompts from JSON maps) are derived in the body of the render function unmemoized, they will block the main thread 10 times a second and completely freeze the UI during high-activity tasks.
+**Action:** Always strictly use `useMemo` for any complex derived state (like array manipulations and object mappings) when a component has an ongoing local interval/timer that causes rapid, continuous re-rendering.
