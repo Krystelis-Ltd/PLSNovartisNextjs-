@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
         });
 
         return NextResponse.json({ status: 'ok' });
-    } catch (error: any) {
+    } catch (error: unknown) {
         const msg = error instanceof Error ? error.message : String(error);
         console.error('[audit-api] Error processing audit event:', error);
         auditLog({
