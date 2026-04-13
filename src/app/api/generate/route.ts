@@ -370,7 +370,7 @@ export async function POST(request: NextRequest) {
                         textPatches[key] = { type: PatchType.PARAGRAPH, children: [new TextRun(JSON.stringify(value))] };
                     }
                 } else if (Array.isArray(value)) {
-                    let runs: TextRun[] = [];
+                    const runs: TextRun[] = [];
                     for (let i = 0; i < value.length; i++) {
                         const item = value[i];
                         if (typeof item === 'string') {

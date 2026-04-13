@@ -38,7 +38,7 @@ export function auditLog({ request, action, resource, status, details }: AuditLo
     const user = getUserIdentity(request);
     
     // Attempt standard UUID, fallback to basic pseudo-random if unavailable
-    let fallbackId = Math.random().toString(36).substring(2, 10);
+    const fallbackId = Math.random().toString(36).substring(2, 10);
     let uuid = fallbackId;
     try {
         if (typeof crypto !== 'undefined' && crypto.randomUUID) {

@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
         const buffer = Buffer.from(arrayBuffer);
 
         let markdown = '';
-        let metadata: Record<string, string> = {
+        const metadata: Record<string, string> = {
             fileName: file.name,
             fileSize: `${(file.size / 1024 / 1024).toFixed(2)} MB`,
             convertedAt: new Date().toISOString(),
