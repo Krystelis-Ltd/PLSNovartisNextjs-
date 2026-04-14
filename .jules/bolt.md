@@ -1,0 +1,3 @@
+## 2024-04-14 - Unmemoized Derived State in Interval-Heavy Components
+**Learning:** Components with frequent state updates from intervals (e.g., progress timers, extraction statuses ticking every 100ms) will synchronously re-render and execute all unmemoized top-level code. In `src/app/page.tsx`, complex operations like prompt parsing (`extractPrompts`), filtering large arrays (`currentFetchedAnswers`), and recreating callback references were being re-run on every 100ms tick, blocking the main thread and causing severe UI degradation.
+**Action:** Always strictly memoize derived data (`useMemo`) and inline prop functions (`useCallback`) in components featuring frequent ticks or progress bars to decouple heavy computations from simple visual updates.
