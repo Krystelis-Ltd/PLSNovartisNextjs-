@@ -140,7 +140,7 @@ export async function POST(request: NextRequest) {
     } catch (error: unknown) {
         console.error("Markdown conversion error:", error);
         return NextResponse.json(
-            { error: "Conversion failed", details: error instanceof Error ? error.message : String(error) },
+            { error: "Conversion failed" },
             { status: 500 }
         );
     }

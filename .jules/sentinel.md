@@ -1,0 +1,4 @@
+## 2025-02-24 - [Fix Information Disclosure in API Error Responses]
+**Vulnerability:** Internal error messages (error.message or String(error)) were being directly returned to clients in 500 error responses (e.g., `{ error: "Chat failed", details: msg }`) across multiple API routes (chat, convert-to-markdown, extract, generate, refine, upload). This leaked internal application logic and potential stack traces.
+**Learning:** Developers frequently return error details to clients for debugging purposes without considering the security implications of leaking internal server state or dependency information.
+**Prevention:** Ensure API routes fail securely by returning generic error messages to the client (e.g., `{ error: "Operation failed" }`) and only logging detailed error messages server-side via `auditLog` or `console.error`.
