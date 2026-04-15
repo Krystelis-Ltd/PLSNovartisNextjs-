@@ -105,6 +105,7 @@ export function PipelineTestUI({ onClose }: TestUIProps) {
             <p className="text-sm text-slate-600 dark:text-slate-400">View mock data shapes, test rendering, and generate Word documents</p>
           </div>
           <button
+            aria-label="Close test UI"
             onClick={onClose}
             className="p-2 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
           >
@@ -204,7 +205,7 @@ export function PipelineTestUI({ onClose }: TestUIProps) {
                     <span className="material-symbols-outlined text-blue-500 text-[20px]">format_quote</span>
                     <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200">Source Document Proof</h3>
                   </div>
-                  <button onClick={() => setSourceModal(null)} className="p-1 rounded-lg hover:bg-slate-200/60 dark:hover:bg-slate-700/60">
+                  <button aria-label="Close source modal" onClick={() => setSourceModal(null)} className="p-1 rounded-lg hover:bg-slate-200/60 dark:hover:bg-slate-700/60">
                     <span className="material-symbols-outlined text-slate-500 text-[20px]">close</span>
                   </button>
                 </div>

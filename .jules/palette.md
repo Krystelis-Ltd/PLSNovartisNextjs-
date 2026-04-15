@@ -1,0 +1,3 @@
+## 2025-04-15 - Missing ARIA Labels on Icon-Only Buttons
+**Learning:** Found multiple icon-only buttons in the application missing aria-labels. Screen reader users would have no context for what these buttons do. This pattern was identified in `Chatbot.tsx`, `PipelineTestUI.tsx`, and `JsonEditor.tsx`.
+**Action:** Always add descriptive `aria-label` attributes to icon-only buttons to ensure they are accessible to screen reader users. The application relies heavily on Google Material Symbols, so scanning for `material-symbols-outlined` inside a `<button>` without text is a good way to find these.

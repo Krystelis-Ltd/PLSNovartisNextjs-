@@ -91,7 +91,7 @@ export function Chatbot({ vectorStoreId, fetchedAnswers, onUpdateData }: Chatbot
                                 <span className="material-symbols-outlined text-xl">forum</span>
                                 <span className="font-bold text-sm">Contextual Chatbot</span>
                             </div>
-                            <button onClick={() => setIsOpen(false)} className="hover:bg-white/20 rounded-full p-1 transition-colors">
+                            <button aria-label="Close chatbot" onClick={() => setIsOpen(false)} className="hover:bg-white/20 rounded-full p-1 transition-colors">
                                 <span className="material-symbols-outlined text-lg block">close</span>
                             </button>
                         </div>
@@ -160,6 +160,7 @@ export function Chatbot({ vectorStoreId, fetchedAnswers, onUpdateData }: Chatbot
                                             disabled={isLoading}
                                         />
                                         <motion.button
+                                            aria-label="Send message"
                                             whileHover={{ scale: 1.08 }}
                                             whileTap={{ scale: 0.92 }}
                                             onClick={handleSend}
@@ -178,6 +179,7 @@ export function Chatbot({ vectorStoreId, fetchedAnswers, onUpdateData }: Chatbot
                     </motion.div>
                 ) : (
                     <motion.button
+                        aria-label="Open contextual chatbot"
                         key="chatbot-fab"
                         initial={{ scale: 0 }}
                         animate={{ scale: 1 }}
