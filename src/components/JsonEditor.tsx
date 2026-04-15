@@ -146,14 +146,14 @@ export function JsonEditor({ data, onUpdate, onRequestAIRefine, isRefining }: Js
                   <div className="flex items-center gap-1.5">
                     <input type="text" value={String(h)} onChange={(e) => updateNestedValue([...path, 'headers', String(ci)], e.target.value)}
                       className={`w-full bg-transparent outline-none ${thText} py-0.5 focus:ring-2 focus:ring-[var(--color-primary)]/30 rounded px-1`} />
-                    <button onClick={() => removeTableColumn(path, ci)} className="opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-600 shrink-0 transition-opacity" title="Remove column">
+                    <button aria-label="Remove column" onClick={() => removeTableColumn(path, ci)} className="opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-600 shrink-0 transition-opacity" title="Remove column">
                       <span className="material-symbols-outlined text-[16px]">close</span>
                     </button>
                   </div>
                 </th>
               ))}
               <th className="w-12 border-b-2 border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-800 text-center">
-                <button onClick={() => addTableColumn(path)} className="text-[var(--color-primary)] hover:bg-[var(--color-primary)]/10 rounded p-1.5 transition-colors" title="Add column">
+                <button aria-label="Add column" onClick={() => addTableColumn(path)} className="text-[var(--color-primary)] hover:bg-[var(--color-primary)]/10 rounded p-1.5 transition-colors" title="Add column">
                   <span className="material-symbols-outlined text-[18px]">add</span>
                 </button>
               </th>
@@ -165,7 +165,7 @@ export function JsonEditor({ data, onUpdate, onRequestAIRefine, isRefining }: Js
                 <td className={rowNumTd}>
                   <div className="flex items-center justify-center gap-1">
                     <span className="text-xs text-slate-500 dark:text-slate-400 font-mono font-medium">{ri + 1}</span>
-                    <button onClick={() => removeTableRow(path, ri)} className="opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-600 transition-opacity" title="Remove row">
+                    <button aria-label="Remove row" onClick={() => removeTableRow(path, ri)} className="opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-600 transition-opacity" title="Remove row">
                       <span className="material-symbols-outlined text-[14px]">remove_circle</span>
                     </button>
                   </div>
@@ -201,7 +201,7 @@ export function JsonEditor({ data, onUpdate, onRequestAIRefine, isRefining }: Js
                     <div className="flex items-center gap-1.5">
                       <span className={thText}>{toTitleCase(key)}</span>
                       {allKeys.length > 1 && (
-                        <button onClick={() => removeArrObjColumn(path, key)} className="opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-600 shrink-0 transition-opacity" title="Remove column">
+                        <button aria-label="Remove column" onClick={() => removeArrObjColumn(path, key)} className="opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-600 shrink-0 transition-opacity" title="Remove column">
                           <span className="material-symbols-outlined text-[16px]">close</span>
                         </button>
                       )}
@@ -209,7 +209,7 @@ export function JsonEditor({ data, onUpdate, onRequestAIRefine, isRefining }: Js
                   </th>
                 ))}
                 <th className="w-12 border-b-2 border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-800 text-center">
-                  <button onClick={() => { const n = prompt("Column name:"); if (n?.trim()) addArrObjColumn(path, n.trim()) }}
+                  <button aria-label="Add column" onClick={() => { const n = prompt("Column name:"); if (n?.trim()) addArrObjColumn(path, n.trim()) }}
                     className="text-[var(--color-primary)] hover:bg-[var(--color-primary)]/10 rounded p-1.5 transition-colors" title="Add column">
                     <span className="material-symbols-outlined text-[18px]">add</span>
                   </button>
@@ -222,7 +222,7 @@ export function JsonEditor({ data, onUpdate, onRequestAIRefine, isRefining }: Js
                   <td className={rowNumTd}>
                     <div className="flex items-center justify-center gap-1">
                       <span className="text-xs text-slate-500 dark:text-slate-400 font-mono font-medium">{ri + 1}</span>
-                      <button onClick={() => removeArrObjRow(path, ri)} className="opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-600 transition-opacity" title="Remove row">
+                      <button aria-label="Remove row" onClick={() => removeArrObjRow(path, ri)} className="opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-600 transition-opacity" title="Remove row">
                         <span className="material-symbols-outlined text-[14px]">remove_circle</span>
                       </button>
                     </div>
@@ -263,7 +263,7 @@ export function JsonEditor({ data, onUpdate, onRequestAIRefine, isRefining }: Js
                   <div className="flex items-center gap-1.5">
                     <input type="text" value={l} onChange={(e) => updateNestedValue([...path, 'labels', String(li)], e.target.value)}
                       className={`w-full bg-transparent outline-none ${thText} text-center py-0.5 focus:ring-2 focus:ring-[var(--color-primary)]/30 rounded px-1`} />
-                    <button onClick={() => { const { newData, current } = cloneAndNavigate(path); current.labels.splice(li, 1); current.datasets.forEach((ds: any) => ds.data.splice(li, 1)); onUpdate(newData) }}
+                    <button aria-label="Remove column" onClick={() => { const { newData, current } = cloneAndNavigate(path); current.labels.splice(li, 1); current.datasets.forEach((ds: any) => ds.data.splice(li, 1)); onUpdate(newData) }}
                       className="opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-600 shrink-0 transition-opacity" title="Remove column">
                       <span className="material-symbols-outlined text-[16px]">close</span>
                     </button>
@@ -271,7 +271,7 @@ export function JsonEditor({ data, onUpdate, onRequestAIRefine, isRefining }: Js
                 </th>
               ))}
               <th className="w-12 border-b-2 border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-800 text-center">
-                <button onClick={() => { const { newData, current } = cloneAndNavigate(path); current.labels.push(`Label ${current.labels.length + 1}`); current.datasets.forEach((ds: any) => ds.data.push("")); onUpdate(newData) }}
+                <button aria-label="Add column" onClick={() => { const { newData, current } = cloneAndNavigate(path); current.labels.push(`Label ${current.labels.length + 1}`); current.datasets.forEach((ds: any) => ds.data.push("")); onUpdate(newData) }}
                   className="text-[var(--color-primary)] hover:bg-[var(--color-primary)]/10 rounded p-1.5 transition-colors" title="Add column">
                   <span className="material-symbols-outlined text-[18px]">add</span>
                 </button>
@@ -285,7 +285,7 @@ export function JsonEditor({ data, onUpdate, onRequestAIRefine, isRefining }: Js
                   <div className="flex items-center gap-1">
                     <textarea value={ds.label} onChange={(e) => updateNestedValue([...path, 'datasets', String(di), 'label'], e.target.value)}
                       className={`${cellTextarea} font-medium`} rows={autoRows(String(ds.label ?? ""), 1, 25)} />
-                    <button onClick={() => { const { newData, current } = cloneAndNavigate(path); current.datasets.splice(di, 1); onUpdate(newData) }}
+                    <button aria-label="Remove row" onClick={() => { const { newData, current } = cloneAndNavigate(path); current.datasets.splice(di, 1); onUpdate(newData) }}
                       className="opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-600 shrink-0 transition-opacity" title="Remove row">
                       <span className="material-symbols-outlined text-[14px]">remove_circle</span>
                     </button>
@@ -339,7 +339,7 @@ export function JsonEditor({ data, onUpdate, onRequestAIRefine, isRefining }: Js
               <textarea value={String(item)} onChange={(e) => updateNestedValue([...path, String(idx)], e.target.value)}
                 className="flex-1 px-3 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 outline-none focus:border-[var(--color-primary)] focus:ring-1 focus:ring-[var(--color-primary)]/20 resize-y"
                 rows={String(item).length > 100 ? 3 : 1} />
-              <button onClick={() => { const newData = JSON.parse(JSON.stringify(data)); let arr = newData; for (let i = 0; i < path.length - 1; i++) arr = arr[path[i]]; const lastKey = path[path.length - 1]; if (lastKey !== undefined) arr = arr[lastKey]; if (Array.isArray(arr)) { arr.splice(idx, 1); onUpdate(newData); } }}
+              <button aria-label="Remove item" onClick={() => { const newData = JSON.parse(JSON.stringify(data)); let arr = newData; for (let i = 0; i < path.length - 1; i++) arr = arr[path[i]]; const lastKey = path[path.length - 1]; if (lastKey !== undefined) arr = arr[lastKey]; if (Array.isArray(arr)) { arr.splice(idx, 1); onUpdate(newData); } }}
                 className="opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-600 mt-2 shrink-0 transition-opacity" title="Remove item">
                 <span className="material-symbols-outlined text-[16px]">remove_circle</span>
               </button>
@@ -360,7 +360,7 @@ export function JsonEditor({ data, onUpdate, onRequestAIRefine, isRefining }: Js
             <div key={idx} className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-lg border border-slate-100 dark:border-slate-800 relative group">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Entry {idx + 1}</span>
-                <button onClick={() => { const newData = JSON.parse(JSON.stringify(data)); let arr = newData; for (const k of path) arr = arr[k]; if (Array.isArray(arr)) { arr.splice(idx, 1); onUpdate(newData); } }}
+                <button aria-label="Remove entry" onClick={() => { const newData = JSON.parse(JSON.stringify(data)); let arr = newData; for (const k of path) arr = arr[k]; if (Array.isArray(arr)) { arr.splice(idx, 1); onUpdate(newData); } }}
                   className="opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-600 transition-opacity" title="Remove entry">
                   <span className="material-symbols-outlined text-[14px]">remove_circle</span>
                 </button>
