@@ -1,0 +1,3 @@
+## 2024-05-23 - Prevent UI Blockage from Timer Ticks
+**Learning:** In components featuring frequent state updates (like the 100ms timer in `src/app/page.tsx` during extraction tasks), derived data (e.g., parsing prompts or filtering extraction feed) must be strictly memoized using `useMemo` and prop functions using `useCallback`. This prevents heavy synchronous computations from blocking the main thread during simple visual updates.
+**Action:** Always wrap expensive synchronous derivations in `useMemo` when they depend on state that does not change as frequently as other rapidly changing state in the same component.
