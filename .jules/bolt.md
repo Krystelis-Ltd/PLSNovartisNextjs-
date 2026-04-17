@@ -1,0 +1,3 @@
+## 2025-02-28 - [Memoizing derived state and callbacks during rapid updates]
+**Learning:** Components featuring frequent state updates or ticks (like the `100ms` extraction timer in `src/app/page.tsx`) cause their bodies to re-execute frequently. In Next.js/React, this can severely impact performance if heavy derived calculations or child component props are repeatedly recreated on every render.
+**Action:** Always strictly memoize derived data (`useMemo`) and inline prop functions (`useCallback`) to decouple heavy computations from simple visual updates and prevent synchronous UI blocking, especially for logic like filtering arrays and derived state extraction.
