@@ -1,0 +1,3 @@
+## 2024-04-19 - Accessibility for Framer Motion Buttons
+**Learning:** Icon-only interactive elements implemented with `framer-motion` (`<motion.button>`) frequently lack semantic accessibility labels and visible focus indicators, making them completely inaccessible to keyboard and screen reader users despite having high-quality pointer animations.
+**Action:** Always verify that `<motion.button>` elements intended as interactive controls include descriptive `aria-label` attributes and standard Tailwind `focus-visible` utility classes (e.g., `focus-visible:ring-2 outline-none`) to ensure parity between mouse/touch and keyboard/screen reader experiences.
