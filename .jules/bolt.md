@@ -1,0 +1,3 @@
+## 2024-05-24 - Memoizing derived state during tick renders
+**Learning:** Next.js applications featuring components with interval timers (like `100ms` ticks for progress bars or chronometers) are highly susceptible to synchronous UI blocking if expensive operations or object filtering occur unmemoized inside the render cycle. Even minor derived states can stack up unacceptably if calculated 10 times a second.
+**Action:** Always wrap derived datasets using `useMemo` and inline functions passed to child components using `useCallback` when a component includes interval state updates, breaking the correlation between rapid visual ticks and heavy derived calculations.
