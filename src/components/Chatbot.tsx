@@ -91,8 +91,8 @@ export function Chatbot({ vectorStoreId, fetchedAnswers, onUpdateData }: Chatbot
                                 <span className="material-symbols-outlined text-xl">forum</span>
                                 <span className="font-bold text-sm">Contextual Chatbot</span>
                             </div>
-                            <button onClick={() => setIsOpen(false)} className="hover:bg-white/20 rounded-full p-1 transition-colors">
-                                <span className="material-symbols-outlined text-lg block">close</span>
+                            <button aria-label="Close chatbot" onClick={() => setIsOpen(false)} className="hover:bg-white/20 rounded-full p-1 transition-colors focus-visible:ring-2 focus-visible:ring-white outline-none">
+                                <span aria-hidden="true" className="material-symbols-outlined text-lg block">close</span>
                             </button>
                         </div>
 
@@ -160,13 +160,14 @@ export function Chatbot({ vectorStoreId, fetchedAnswers, onUpdateData }: Chatbot
                                             disabled={isLoading}
                                         />
                                         <motion.button
+                                            aria-label="Send message"
                                             whileHover={{ scale: 1.08 }}
                                             whileTap={{ scale: 0.92 }}
                                             onClick={handleSend}
                                             disabled={!input.trim() || isLoading}
-                                            className="bg-[var(--color-primary)] text-white h-10 w-10 rounded-full flex items-center justify-center hover:bg-[var(--color-primary-dark)] transition-colors disabled:opacity-50 shrink-0 shadow-md"
+                                            className="bg-[var(--color-primary)] text-white h-10 w-10 rounded-full flex items-center justify-center hover:bg-[var(--color-primary-dark)] transition-colors disabled:opacity-50 shrink-0 shadow-md focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] outline-none"
                                         >
-                                            <span className="material-symbols-outlined text-[18px]">send</span>
+                                            <span aria-hidden="true" className="material-symbols-outlined text-[18px]">send</span>
                                         </motion.button>
                                     </div>
                                     <div className="text-[10px] text-slate-400 dark:text-slate-500 text-center font-medium">
@@ -178,6 +179,7 @@ export function Chatbot({ vectorStoreId, fetchedAnswers, onUpdateData }: Chatbot
                     </motion.div>
                 ) : (
                     <motion.button
+                        aria-label="Open chatbot"
                         key="chatbot-fab"
                         initial={{ scale: 0 }}
                         animate={{ scale: 1 }}
@@ -186,9 +188,9 @@ export function Chatbot({ vectorStoreId, fetchedAnswers, onUpdateData }: Chatbot
                         whileTap={{ scale: 0.9 }}
                         transition={{ type: 'spring', stiffness: 500, damping: 25 }}
                         onClick={() => setIsOpen(true)}
-                        className="h-14 w-14 bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] text-white rounded-full shadow-[var(--shadow-elevated)] flex items-center justify-center"
+                        className="h-14 w-14 bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] text-white rounded-full shadow-[var(--shadow-elevated)] flex items-center justify-center focus-visible:ring-2 focus-visible:ring-white outline-none"
                     >
-                        <span className="material-symbols-outlined text-2xl">chat</span>
+                        <span aria-hidden="true" className="material-symbols-outlined text-2xl">chat</span>
                     </motion.button>
                 )}
             </AnimatePresence>
