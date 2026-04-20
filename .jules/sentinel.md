@@ -1,0 +1,4 @@
+## 2025-02-18 - [Prevent Information Disclosure in API Error Responses]
+**Vulnerability:** Five API routes (`chat`, `extract`, `generate`, `refine`, `upload`) were returning detailed internal error messages (`error.message` or `String(error)`) to the client via `NextResponse.json({ error: "...", details: msg })` on 500 status code paths.
+**Learning:** Returning `details` exposes internal mechanics, stack traces, and potentially sensitive environment or connection data to users (CWE-209). Observability logging correctly existed server-side via `console.error` and `auditLog` but was inadvertently mirrored to the user payload.
+**Prevention:** Strictly separate client-facing error responses from server-side audit logs. Always ensure the client only receives generic failure messages for 500-level errors while preserving detailed exception strings in internal logs.

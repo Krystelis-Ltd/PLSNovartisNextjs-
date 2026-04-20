@@ -177,7 +177,7 @@ export async function POST(request: NextRequest) {
         const msg = error instanceof Error ? error.message : String(error);
         const logger = timedAuditLog(request, 'chat', 'chat_message');
         logger.finish({ status: 500, error: msg });
-        return NextResponse.json({ error: "Chat failed", details: msg }, { status: 500 });
+        return NextResponse.json({ error: "Chat failed" }, { status: 500 });
     }
 }
 
