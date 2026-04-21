@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { extractPrompts } from '@/utils/promptLoader'
 import { JsonEditor } from '@/components/JsonEditor'
@@ -75,7 +75,9 @@ export default function Dashboard() {
   }, []);
 
   // Dynamic prompts derived from selection
-  const promptData = extractPrompts(readabilityLevel, mappingName)
+  // ⚡ Bolt Optimization: Memoize prompt extraction to prevent expensive recalculations during the 100ms interval extraction timer updates.
+  // Impact: Eliminates redundant parsing of the large extracted_data.json on every render tick.
+  const promptData = useMemo(() => extractPrompts(readabilityLevel, mappingName), [readabilityLevel, mappingName])
   const keys = promptData.keys;
   const texts = promptData.texts;
   const mapping = promptData.mapping;
@@ -490,22 +492,28 @@ export default function Dashboard() {
     );
   };
 
-  const currentFetchedAnswers = extractionFeed
-    .filter(f => f.status === 'COMPLETED' && f.parsedObj)
-    .reduce((acc, feed) => {
-      const keyIndex = keys.indexOf(feed.title);
-      let finalKey = feed.title;
-      if (keyIndex !== -1) {
-        const m = mapping[String(keyIndex + 1) as keyof typeof mapping] as any;
-        if (m) {
-          if (m.placeholder) finalKey = m.placeholder;
-          else if (m.table_placeholder) finalKey = m.table_placeholder.replace(/^{{/, '').replace(/}}$/, '');
+  // ⚡ Bolt Optimization: Memoize the filtering and reduction of the extraction feed into final answers.
+  // Impact: Prevents O(n) array operations on every 100ms render tick when the extraction timer updates state.
+  const currentFetchedAnswers = useMemo(() => {
+    return extractionFeed
+      .filter(f => f.status === 'COMPLETED' && f.parsedObj)
+      .reduce((acc, feed) => {
+        const keyIndex = keys.indexOf(feed.title);
+        let finalKey = feed.title;
+        if (keyIndex !== -1) {
+          const m = mapping[String(keyIndex + 1) as keyof typeof mapping] as any;
+          if (m) {
+            if (m.placeholder) finalKey = m.placeholder;
+            else if (m.table_placeholder) finalKey = m.table_placeholder.replace(/^{{/, '').replace(/}}$/, '');
+          }
         }
-      }
-      return { ...acc, [finalKey]: feed.parsedObj };
-    }, {});
+        return { ...acc, [finalKey]: feed.parsedObj };
+      }, {});
+  }, [extractionFeed, keys, mapping]);
 
-  const handleChatbotUpdate = (keyToUpdate: string, newValue: any) => {
+  // ⚡ Bolt Optimization: Memoize the update handler passed to the Chatbot component.
+  // Impact: Prevents the inline callback from being redefined on every render tick, stabilizing Chatbot's prop references.
+  const handleChatbotUpdate = useCallback((keyToUpdate: string, newValue: any) => {
     setExtractionFeed(prev => prev.map(feed => {
       const keyIndex = keys.indexOf(feed.title);
       let finalKey = feed.title;
@@ -526,7 +534,7 @@ export default function Dashboard() {
       }
       return feed;
     }));
-  };
+  }, [keys, mapping]);
 
   return (
     <div className="flex flex-col h-full w-full relative gradient-mesh">
