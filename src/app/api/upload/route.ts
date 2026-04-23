@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
                     status: { code: 400, result: 'FAILURE' },
                     details: { error: msg }
                 });
-                return NextResponse.json({ error: msg }, { status: 400 });
+                return NextResponse.json({ error: "File exceeds size limit" }, { status: 400 });
             }
             const ext = '.' + file.name.split('.').pop()?.toLowerCase();
             if (!ALLOWED_FILE_EXTENSIONS.includes(ext as typeof ALLOWED_FILE_EXTENSIONS[number])) {
@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
                     status: { code: 400, result: 'FAILURE' },
                     details: { error: msg }
                 });
-                return NextResponse.json({ error: msg }, { status: 400 });
+                return NextResponse.json({ error: "Unsupported file extension" }, { status: 400 });
             }
         }
 
@@ -137,7 +137,7 @@ export async function POST(request: NextRequest) {
             details: { error: msg }
         });
         return NextResponse.json(
-            { error: "Failed to process upload", details: msg },
+            { error: "Failed to process upload" },
             { status: 500 }
         );
     }
