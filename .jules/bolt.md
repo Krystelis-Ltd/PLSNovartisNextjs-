@@ -1,0 +1,3 @@
+## 2024-04-24 - Strict Memoization Required for High-Frequency State Updates
+**Learning:** Components featuring frequent state updates or ticks (e.g., 100ms interval timers for extraction progress) must strictly memoize derived data (`useMemo`) and inline prop functions (`useCallback`). In `src/app/page.tsx`, failing to memoize derived state like `promptData` and `currentFetchedAnswers` caused synchronous UI blocking and expensive re-calculations on every 100ms tick.
+**Action:** Always wrap derived properties in `useMemo` and functions passed to children in `useCallback` when a component includes an interval timer or rapid state update pattern to prevent performance regressions.
