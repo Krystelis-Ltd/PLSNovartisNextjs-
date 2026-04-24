@@ -467,6 +467,6 @@ export async function POST(request: NextRequest) {
             status: { code: 500, result: 'FAILURE' },
             details: { error: msg }
         });
-        return NextResponse.json({ error: "Generation failed", details: msg }, { status: 500 });
+        return NextResponse.json({ error: "Generation failed" }, { status: 500 });
     }
 }

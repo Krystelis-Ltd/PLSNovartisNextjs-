@@ -1,0 +1,4 @@
+## 2024-05-18 - Prevent API Information Disclosure (Fail Securely)
+**Vulnerability:** API routes were returning internal error messages (e.g., stack traces or internal exception details) directly to the client via `NextResponse.json` in catch blocks (e.g., `{ error: "Failed", details: error.message }`).
+**Learning:** Sending `details: msg` directly to the client in HTTP 500 error responses can expose sensitive backend configuration, logic, or dependencies to potential attackers. This application logs the errors appropriately server-side via `auditLog`, making it safe to remove the details from the client response.
+**Prevention:** Always fail securely by returning generic error messages to the client (e.g., `{ error: "Operation failed" }`) and ensuring detailed error messages (`error.message` or `String(error)`) are logged server-side via `auditLog` or `console.error` only.
