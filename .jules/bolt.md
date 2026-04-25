@@ -1,0 +1,3 @@
+## 2024-04-25 - Prevent UI Blocking on Frequent State Updates
+**Learning:** Components with rapid interval state ticks (e.g., 100ms timers like `extractionTimeMs`) trigger frequent re-renders. If expensive computations like parsing prompts or filtering large arrays (e.g., `currentFetchedAnswers`) aren't strictly memoized, they run synchronously on every tick, blocking the main thread and causing UI jank.
+**Action:** Always wrap derived data (with `useMemo`) and inline prop functions (with `useCallback`) in components featuring rapid state ticks to decouple heavy computations from simple visual updates.
