@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
             } catch (e: unknown) {
                 const msg = e instanceof Error ? e.message : String(e);
                 console.error(`[upload] Failed: ${file.name}:`, msg);
-                errors.push(`Failed to upload '${file.name}': ${msg}`);
+                errors.push(`Failed to upload '${file.name}'`);
                 auditLog({
                     request, action: 'FILE_UPLOAD',
                     resource: { type: 'file', name: file.name, size: file.size, path: 'failed' },
@@ -105,7 +105,7 @@ export async function POST(request: NextRequest) {
         } catch (vsError: unknown) {
             const msg = vsError instanceof Error ? vsError.message : String(vsError);
             console.error("[upload] Vector store creation failed:", msg);
-            errors.push(`Vector store creation failed: ${msg}`);
+            errors.push(`Vector store creation failed.`);
         }
 
         auditLog({
@@ -137,7 +137,7 @@ export async function POST(request: NextRequest) {
             details: { error: msg }
         });
         return NextResponse.json(
-            { error: "Failed to process upload", details: msg },
+            { error: "Failed to process upload" },
             { status: 500 }
         );
     }

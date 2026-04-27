@@ -7,7 +7,7 @@
  * Run with: npx tsx src/__tests__/prompt-pipeline.test.ts
  */
 
-import extractedData from '../utils/extracted_data.json';
+import extractedData from '../utils/extracted_data.json' with { type: 'json' };
 
 // ─── Test Harness ───
 let passed = 0;

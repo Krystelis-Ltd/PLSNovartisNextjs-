@@ -1,0 +1,4 @@
+## 2025-04-27 - [Information Disclosure in API Error Responses]
+**Vulnerability:** The API routes were exposing internal error messages, stack traces, and underlying system information in `NextResponse.json` error responses (e.g., `details: msg`) when returning HTTP 500 status codes. This could allow attackers to glean details about the application's internal structure and dependencies.
+**Learning:** Returning detailed error information to the client violates the "fail securely" principle. Detailed logs should only be retained server-side via `console.error` and `auditLog`.
+**Prevention:** Always catch exceptions in API handlers and return generic error messages (e.g., `{ error: "Operation failed" }`) to the client, while logging the actual error details internally.
