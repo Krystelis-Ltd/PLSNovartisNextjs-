@@ -1,0 +1,3 @@
+## 2025-04-28 - [Memoizing Derived State with Rapid Timers]
+**Learning:** In components with highly frequent state updates, such as interval timers running every 100ms for progress bars (`extractionTimeMs`), any complex derived state (like array `filter`/`reduce` or dynamic key resolution) that relies on unmemoized props or state will trigger expensive, synchronous recalculations on the main thread during every single 100ms tick, leading to major UI jank.
+**Action:** Always wrap heavy derived data processing in `useMemo`, and inline callback functions (like `handleChatbotUpdate`) in `useCallback` when passed to expensive child components (like `Chatbot`), to ensure reference stability and prevent blocking the UI during rapid, unrelated state ticks.
