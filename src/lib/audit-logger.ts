@@ -34,6 +34,17 @@ export interface AuditLogParams {
     details?: any;
 }
 
+function getSecureIp(request: NextRequest): string {
+    const azureIp = request.headers.get('x-azure-clientip');
+    if (azureIp) return azureIp;
+    const forwardedFor = request.headers.get('x-forwarded-for');
+    if (forwardedFor) {
+        const parts = forwardedFor.split(',');
+        return parts[parts.length - 1].trim();
+    }
+    return request.headers.get('x-real-ip') || 'unknown';
+}
+
 export function auditLog({ request, action, resource, status, details }: AuditLogParams) {
     const user = getUserIdentity(request);
     
@@ -51,7 +62,7 @@ export function auditLog({ request, action, resource, status, details }: AuditLo
     // Extract headers
     const sessionId = request.headers.get('x-session-id') || `sess_${uuid.substring(0, 8)}`;
     const correlationId = request.headers.get('x-correlation-id') || `corr_${uuid.substring(0, 8)}`;
-    const publicIp = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
+    const publicIp = getSecureIp(request);
     const userAgent = request.headers.get('user-agent') || 'unknown';
 
     let endpoint = 'unknown';
