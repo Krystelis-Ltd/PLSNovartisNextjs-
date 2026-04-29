@@ -88,11 +88,11 @@ export function Chatbot({ vectorStoreId, fetchedAnswers, onUpdateData }: Chatbot
                         {/* Header */}
                         <div className="bg-[var(--color-primary)] px-4 py-3 flex items-center justify-between text-white shadow-sm shrink-0">
                             <div className="flex items-center gap-2">
-                                <span className="material-symbols-outlined text-xl">forum</span>
+                                <span className="material-symbols-outlined text-xl" aria-hidden="true">forum</span>
                                 <span className="font-bold text-sm">Contextual Chatbot</span>
                             </div>
-                            <button onClick={() => setIsOpen(false)} className="hover:bg-white/20 rounded-full p-1 transition-colors">
-                                <span className="material-symbols-outlined text-lg block">close</span>
+                            <button aria-label="Close chatbot" onClick={() => setIsOpen(false)} className="hover:bg-white/20 rounded-full p-1 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white">
+                                <span className="material-symbols-outlined text-lg block" aria-hidden="true">close</span>
                             </button>
                         </div>
 
@@ -105,7 +105,7 @@ export function Chatbot({ vectorStoreId, fetchedAnswers, onUpdateData }: Chatbot
                                     transition={{ delay: 0.2 }}
                                     className="text-center text-slate-500 mt-10"
                                 >
-                                    <span className="material-symbols-outlined text-4xl opacity-50 block mb-2">smart_toy</span>
+                                    <span className="material-symbols-outlined text-4xl opacity-50 block mb-2" aria-hidden="true">smart_toy</span>
                                     <p>Ask me questions about your document or extracted values!</p>
                                 </motion.div>
                             )}
@@ -160,13 +160,14 @@ export function Chatbot({ vectorStoreId, fetchedAnswers, onUpdateData }: Chatbot
                                             disabled={isLoading}
                                         />
                                         <motion.button
+                                            aria-label="Send message"
                                             whileHover={{ scale: 1.08 }}
                                             whileTap={{ scale: 0.92 }}
                                             onClick={handleSend}
                                             disabled={!input.trim() || isLoading}
-                                            className="bg-[var(--color-primary)] text-white h-10 w-10 rounded-full flex items-center justify-center hover:bg-[var(--color-primary-dark)] transition-colors disabled:opacity-50 shrink-0 shadow-md"
+                                            className="bg-[var(--color-primary)] text-white h-10 w-10 rounded-full flex items-center justify-center hover:bg-[var(--color-primary-dark)] transition-colors disabled:opacity-50 shrink-0 shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--color-primary)]"
                                         >
-                                            <span className="material-symbols-outlined text-[18px]">send</span>
+                                            <span className="material-symbols-outlined text-[18px]" aria-hidden="true">send</span>
                                         </motion.button>
                                     </div>
                                     <div className="text-[10px] text-slate-400 dark:text-slate-500 text-center font-medium">
@@ -179,6 +180,7 @@ export function Chatbot({ vectorStoreId, fetchedAnswers, onUpdateData }: Chatbot
                 ) : (
                     <motion.button
                         key="chatbot-fab"
+                        aria-label="Open chatbot"
                         initial={{ scale: 0 }}
                         animate={{ scale: 1 }}
                         exit={{ scale: 0 }}
@@ -186,9 +188,9 @@ export function Chatbot({ vectorStoreId, fetchedAnswers, onUpdateData }: Chatbot
                         whileTap={{ scale: 0.9 }}
                         transition={{ type: 'spring', stiffness: 500, damping: 25 }}
                         onClick={() => setIsOpen(true)}
-                        className="h-14 w-14 bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] text-white rounded-full shadow-[var(--shadow-elevated)] flex items-center justify-center"
+                        className="h-14 w-14 bg-[var(--color-primary)] hover:bg-[var(--color-primary-dark)] text-white rounded-full shadow-[var(--shadow-elevated)] flex items-center justify-center focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[var(--color-primary)]/50"
                     >
-                        <span className="material-symbols-outlined text-2xl">chat</span>
+                        <span className="material-symbols-outlined text-2xl" aria-hidden="true">chat</span>
                     </motion.button>
                 )}
             </AnimatePresence>

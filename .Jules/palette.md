@@ -1,0 +1,3 @@
+## 2024-04-29 - Accessibility for Icon-only Buttons
+**Learning:** Icon-only buttons using `material-symbols-outlined` need `aria-hidden="true"` on the icon span to prevent screen readers from reading the ligature text (e.g. "chat"). Buttons, including Framer Motion's `motion.button`, need explicitly defined `focus-visible` utility classes (e.g. `focus-visible:ring-2 focus-visible:outline-none`) to ensure keyboard users can see when they are focused, as well as an `aria-label` describing the action.
+**Action:** Always add `aria-hidden="true"` to `material-symbols-outlined` spans, and apply `aria-label` and `focus-visible` Tailwind classes to all icon-only buttons for full screen reader and keyboard accessibility.
