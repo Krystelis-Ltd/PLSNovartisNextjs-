@@ -1,0 +1,3 @@
+## 2024-04-29 - [UI Blockage from Rapid Re-renders]
+**Learning:** Components with 100ms interval timers (like `extractionTimeMs` in the Dashboard) will trigger extremely frequent re-renders. If derived states (`extractPrompts`, `currentFetchedAnswers`) or inline functions (`handleChatbotUpdate`) are not strictly memoized with `useMemo` and `useCallback`, these rapid re-renders will cause continuous re-evaluation of expensive operations, leading to synchronous UI blockage and performance degradation.
+**Action:** Always strictly memoize derived data (`useMemo`) and inline prop functions (`useCallback`) in components featuring frequent state updates or ticks to decouple heavy computations from simple visual updates.

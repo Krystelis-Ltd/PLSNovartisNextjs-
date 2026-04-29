@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { extractPrompts } from '@/utils/promptLoader'
 import { JsonEditor } from '@/components/JsonEditor'
@@ -75,7 +75,7 @@ export default function Dashboard() {
   }, []);
 
   // Dynamic prompts derived from selection
-  const promptData = extractPrompts(readabilityLevel, mappingName)
+  const promptData = useMemo(() => extractPrompts(readabilityLevel, mappingName), [readabilityLevel, mappingName]);
   const keys = promptData.keys;
   const texts = promptData.texts;
   const mapping = promptData.mapping;
@@ -203,7 +203,7 @@ export default function Dashboard() {
     let completedKeys = 0;
 
     // Accumulate answers to provide context to subsequent batches
-    let accumulatedAnswers: Record<string, any> = {};
+    const accumulatedAnswers: Record<string, any> = {};
 
     for (let i = 0; i < activeKeys.length; i += batchSize) {
       const batch = activeKeys.slice(i, i + batchSize);
@@ -213,7 +213,7 @@ export default function Dashboard() {
         batch.includes(feed.title) ? { ...feed, status: "FETCHING..." } : feed
       ));
 
-      let batchPrompts: Record<string, string> = {};
+      const batchPrompts: Record<string, string> = {};
       batch.forEach(k => batchPrompts[k] = texts[k]);
 
       try {
@@ -490,22 +490,24 @@ export default function Dashboard() {
     );
   };
 
-  const currentFetchedAnswers = extractionFeed
-    .filter(f => f.status === 'COMPLETED' && f.parsedObj)
-    .reduce((acc, feed) => {
-      const keyIndex = keys.indexOf(feed.title);
-      let finalKey = feed.title;
-      if (keyIndex !== -1) {
-        const m = mapping[String(keyIndex + 1) as keyof typeof mapping] as any;
-        if (m) {
-          if (m.placeholder) finalKey = m.placeholder;
-          else if (m.table_placeholder) finalKey = m.table_placeholder.replace(/^{{/, '').replace(/}}$/, '');
+  const currentFetchedAnswers = useMemo(() => {
+    return extractionFeed
+      .filter(f => f.status === 'COMPLETED' && f.parsedObj)
+      .reduce((acc, feed) => {
+        const keyIndex = keys.indexOf(feed.title);
+        let finalKey = feed.title;
+        if (keyIndex !== -1) {
+          const m = mapping[String(keyIndex + 1) as keyof typeof mapping] as any;
+          if (m) {
+            if (m.placeholder) finalKey = m.placeholder;
+            else if (m.table_placeholder) finalKey = m.table_placeholder.replace(/^{{/, '').replace(/}}$/, '');
+          }
         }
-      }
-      return { ...acc, [finalKey]: feed.parsedObj };
-    }, {});
+        return { ...acc, [finalKey]: feed.parsedObj };
+      }, {});
+  }, [extractionFeed, keys, mapping]);
 
-  const handleChatbotUpdate = (keyToUpdate: string, newValue: any) => {
+  const handleChatbotUpdate = useCallback((keyToUpdate: string, newValue: any) => {
     setExtractionFeed(prev => prev.map(feed => {
       const keyIndex = keys.indexOf(feed.title);
       let finalKey = feed.title;
@@ -526,7 +528,7 @@ export default function Dashboard() {
       }
       return feed;
     }));
-  };
+  }, [keys, mapping]);
 
   return (
     <div className="flex flex-col h-full w-full relative gradient-mesh">
